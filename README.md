@@ -13,15 +13,13 @@ Ensure that a DNS record exists for `authentik.domain.tld` as the compose and al
 ## Docker Compose setup for Authentik  
 Authentik's developer has an initial docker compose setup guide and `docker-compose.yml` located at:  
 
-???+ info "authentik.io"   
-    https://goauthentik.io/docs/installation/docker-compose   
-    https://goauthentik.io/docker-compose.yml   
+>ℹ️ authentik.io
+> * https://goauthentik.io/docs/installation/docker-compose   
+> * https://goauthentik.io/docker-compose.yml   
 
 In order for the forwardAuth to make sense, I've modified the provided docker-compose.yml and added the appropriate Traefik labels.  I am also using docker secrets in order to protect sensitive information.  
 
-???+ info 
-    I am using "fake" docker secrets and binding them into the compose instead of saving sensitive data in environment variables.  You can remove the secrets section and work with regular environment variables if that makes more sense for your environment.  This is strictly a working example, hopefully with enough documentation to help anyone else that might be stuck.  
-
+> ℹ️ I am using "fake" docker secrets and binding them into the compose instead of saving sensitive data in environment variables.  You can remove the secrets section and work with regular environment variables if that makes more sense for your environment.  This is strictly a working example, hopefully with enough documentation to help anyone else that might be stuck.  
 
 First create an environment variable file `.env` in the same directory as the `docker-compose.yml` with the following information, ensuring to update everywhere that has a **CHANGEME** to match your environment. If you want, these values can all be manually coded into the `docker-compose.yml` instead of having a separate file.  
 
@@ -278,8 +276,8 @@ Traefik is already proxying the connections to the Authentik container/service. 
 
 In order to setup forwardAuth at a minimum, Traefik requires a declaration.  Authentik provides an example, but in accordance with the `docker-compose.yml` the values below should make more sense.  
 
-???+ info "Authentik Forward Auth"  
-    https://goauthentik.io/docs/providers/proxy/forward_auth  
+> ℹ️ Authentik Forward Auth
+> * https://goauthentik.io/docs/providers/proxy/forward_auth  
 
 ```yaml title="middlewares.yml"
 http:
@@ -303,8 +301,9 @@ http:
           - X-authentik-meta-version
 ```
 
-???+ warning "Priority based on rule length"
-    Authentik generates the priority for authentication based on rule length (Traefik label).  This means if you have a rule (Traefik label) for Authentik to listen on multiple host names with `OR, ||` statements, it will have a higher priority than the embedded outpost.  Refer to <https://github.com/goauthentik/authentik/issues/2180> about setting the priority for the embedded outpost.  
+> ⚠️ Priority based on rule length</summary>
+>
+> Authentik generates the priority for authentication based on rule length (Traefik label).  This means if you have a rule (Traefik label) for Authentik to listen on multiple host names with `OR, ||` statements, it will have a higher priority than the embedded outpost.  Refer to <https://github.com/goauthentik/authentik/issues/2180> about setting the priority for the embedded outpost.
 
 Once the Authentik `middleware.yml` with (at least) the above configuration is saved in the Traefik rules directory, validate that the middleware should be listed as enabled, via Traefik's dashboard.  
 
@@ -419,10 +418,10 @@ Once this label is added to the container, recreate it.
 docker-compose up -d -force-recreate whoami-test  
 ```
 
-???+ warning "Incognito Browser"  
-    Because authentik uses cookies, I recommend using Incognito for each piece of testing, so you don't have to clear cookies every time or when something is setup incorrectly.  
-    
-    **While using a container behind Authentik, it prompts for authentication, and then flashes but doesn't load.  This generally indicates cookies are messing up  the loading.  So use INCOGNITO**.
+> ⚠️ Incognito Browser
+>
+> Because authentik uses cookies, I recommend using Incognito for each piece of testing, so you don't have to clear cookies every time or when something is setup incorrectly.
+> <br>**While using a container behind Authentik, it prompts for authentication, and then flashes but doesn't load.  This generally indicates cookies are messing up  the loading.  So use INCOGNITO**.
 
 Next, navigate to `https://whoami-test.domain.tld`.  You should hit the authentication splash page due to Traefik's middleware.  Notice that the text below gives you a little bit of information that it is being caught by the Catch All rule.    
   ![](./images/forwardAuth-domain-splash.png)  
@@ -449,9 +448,10 @@ As of version 2022.07.03 authentik still requires `/outpost.goauthentik.io/` to 
 
 > ***Note: This does not seem to be required on everyone's setup.  Individual Application forwardAuth does not work on mine without this label.  I recommend you check your setup both with this label.***  
 
-???+ info "providers/proxy: no exposed urls #3151"
-    https://github.com/goauthentik/authentik/pull/3151
-    > This PR greatly simplifies the Forward auth setup for traefik and envoy. It'll remove the requirement `/outpost.goauthentik.io` to be openly accessible, which makes setup easier and decreases attack surface.
+> ℹ️ providers/proxy: no exposed urls #3151
+> * https://github.com/goauthentik/authentik/pull/3151
+>
+> This PR greatly simplifies the Forward auth setup for traefik and envoy. It'll remove the requirement `/outpost.goauthentik.io` to be openly accessible, which makes setup easier and decreases attack surface.
 
 ```bash
       ## Individual Application forwardAuth regex (catch any subdomain using individual application forwardAuth)  
@@ -539,10 +539,10 @@ Once this label is added to the container, recreate it.
 docker-compose up -d -force-recreate whoami-test  
 ```
 
-???+ warning "Incognito Browser"  
-    Because authentik uses cookies, I recommend using Incognito for each piece of testing, so you don't have to clear cookies every time or when something is setup incorrectly.  
-    
-    **While using a container behind Authentik, it prompts for authentication, and then flashes but doesn't load.  This generally indicates cookies are messing up  the loading.  So use INCOGNITO**.
+> ⚠️ Incognito Browser
+>
+> Because authentik uses cookies, I recommend using Incognito for each piece of testing, so you don't have to clear cookies every time or when something is setup incorrectly.
+> <br>**While using a container behind Authentik, it prompts for authentication, and then flashes but doesn't load.  This generally indicates cookies are messing up  the loading.  So use INCOGNITO**.
 
 Next, navigate to `https://whoami-test.domain.tld`.  You should hit the authentication splash page due to Traefik's middleware.  Notice that the text below gives you a little bit of information that it is being caught by the Individual Application rule **whoami-test individual application**:      
   ![](./images/forwardAuth-individual-splash.png)  
@@ -578,11 +578,13 @@ Inside the Admin Interface do the following steps to create an additional user:
 
 ## Yubikey  
 
-???+ warning "Backup Admin/Alternate Account"  
-    To prevent locking yourself out and having to start over by deleting your postgres database, create a backup administrator or work on a non-administrator account.  
+> ⚠️ Backup Admin/Alternate Account
+>   
+> To prevent locking yourself out and having to start over by deleting your postgres database, create a backup administrator or work on a non-administrator account.  
 
-???+ info "Force MFA"  
-    If you are unable to perform the below steps, skip to the **Force Authentication** section below  
+> ℹ️ "Force MFA"
+>   
+> If you are unable to perform the below steps, skip to the **Force Authentication** section below  
 
 If in the Admin Interface, go to the User Interface via the button at the top left of the screen.  
   ![](./images/user-interface-button.png)  
